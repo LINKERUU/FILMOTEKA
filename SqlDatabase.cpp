@@ -134,8 +134,12 @@ Stack<Movie> DatabaseManager::search(const QString& text) {
 
     QSqlQuery query;
 
-    query.prepare("SELECT title, year, genre, rating, poster FROM movies WHERE UPPER(title) LIKE :title");
-    query.bindValue(":title", "%" + text.toUpper() + "%");
+    query.exec("PRAGMA case_sensitive_like=OFF");
+
+    query.prepare("SELECT title, year, genre, rating, poster FROM movies WHERE "
+                  "(title LIKE :title) OR (UPPER(title) LIKE :title_upper)");
+    query.bindValue(":title", "%" + text + "%");
+    query.bindValue(":title_upper", "%" + text.toUpper() + "%");
 
     if (!query.exec()) {
         qDebug() << "Ошибка выполнения запроса поиска: " << query.lastError().text();
@@ -154,6 +158,4 @@ Stack<Movie> DatabaseManager::search(const QString& text) {
 
     return movies;
 }
-
-
 
