@@ -36,7 +36,6 @@ private slots:
 
 private:
     Ui::Admin *ui;
-protected:
     DatabaseManager& m_dbManager;
 };
 

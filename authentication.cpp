@@ -20,14 +20,22 @@ Authentication::~Authentication()
     delete ui;
 }
 
+QString Authentication::hashPassword(const QString &password) {
+    QByteArray passwordBytes = password.toUtf8();
+    QByteArray hashed = QCryptographicHash::hash(passwordBytes, QCryptographicHash::Sha256);
+    return QString(hashed.toHex());
+}
+
 void Authentication::on_admin_button_clicked()
 {
     if (ui->admin_button->text() == "Войти") {
-        QString enteredPassword = ui->password_linedit->text();
-        if (enteredPassword == "safa") {
+        QString enteredPasswordHash = hashPassword(ui->password_linedit->text());
+        QString storedPasswordHash = "994c5e2c8b5fe4e7c123d39b74bcc870e7a91b7cd15412745ba085e6d1eb3f0f";
+
+        if (enteredPasswordHash == storedPasswordHash) {
             Admin *adminWindow = new Admin(m_dbManager);
             this->close();
-            adminWindow->exec(); // Завершаем диалог с результатом Accepted
+            adminWindow->exec();
         } else {
             ui->password_linedit->clear();
             ui->error_label->setText("Неверный пароль!");
@@ -42,6 +50,7 @@ void Authentication::on_admin_button_clicked()
         ui->text_label->setText("Администратор");
         ui->admin_button->setText("Войти");
     }
+
 }
 
 void Authentication::on_cancel_button_clicked()

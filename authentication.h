@@ -2,6 +2,7 @@
 #define AUTHENTICATION_H
 
 #include <QDialog>
+#include <QCryptographicHash>
 #include <QApplication>
 #include <QFile>
 #include "SqlDatabase.h"
@@ -26,6 +27,7 @@ private slots:
     void on_show_password_button_clicked();
     void on_password_linedit_textChanged(const QString &arg1);
     void on_user_button_clicked();
+    QString hashPassword(const QString &password);
 
 private:
     Ui::Authentication *ui;

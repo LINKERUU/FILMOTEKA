@@ -28,7 +28,7 @@ public:
     MovieWidget(const QString& title, const QString& year, const QString& genre, double rating,
                 const QByteArray& posterData, DatabaseManager& dbManager, QWidget* parent = nullptr);
 
-protected:
+private:
     bool m_isLiked = true;
     DatabaseManager& m_dbManager; // Добавлено поле для менеджера базы данных
 
@@ -47,8 +47,6 @@ protected:
     QHBoxLayout* createYearGenreLayout(const QString& year, const QString& genre);
     void toggleLikeButton();
     void openNewWindow(const QString& title);
-
-private:
     DetailFIlmWidget *film_window;
 };
 

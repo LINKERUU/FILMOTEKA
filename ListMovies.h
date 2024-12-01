@@ -12,8 +12,6 @@ class ListMovie : public QMainWindow {
 public:
     ListMovie(DatabaseManager& dbManager, QWidget* parent = nullptr);
 
-protected:
-    DatabaseManager& m_dbManager;
 private:
     void setupUI();
 
@@ -30,6 +28,8 @@ private:
     void updateMovieDisplay(Stack<Movie>& movies,bool update);
 
     void clearGridLayout(QGridLayout* gridLayout);
+
+    DatabaseManager& m_dbManager;
 
 };
 
