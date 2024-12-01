@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Authentication</class>
+ <widget class="QDialog" name="Authentication">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1111</width>
+    <height>462</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: #1c262f;</string>
+  </property>
+  <widget class="QWidget" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>40</y>
+     <width>411</width>
+     <height>401</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QWidget{
+ border-radius:12px;
+ background-color: #2a313b;;
+}
+QPushButton {
+	background-color:#7ab561;
+    border-radius:25px;
+    color:#0e1f08;
+    font: 700 12pt &quot;Segoe UI&quot;;
+}
+
+QPushButton:hover {
+	border:1px solid white;
+	color:white;
+	font: 700 13pt &quot;Segoe UI&quot;;
+}</string>
+   </property>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>60</y>
+      <width>71</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>C:/Users/SAFA/Downloads/Remove-bg.ai_1732554787738.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="user_button">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>180</y>
+      <width>291</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton :hover {
+	border:1px solid white;
+}</string>
+    </property>
+    <property name="text">
+     <string>Пользователь</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="admin_button">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>250</y>
+      <width>291</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton :hover {
+	border:1px solid white;
+}</string>
+    </property>
+    <property name="text">
+     <string>Администратор</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="text_label">
+    <property name="geometry">
+     <rect>
+      <x>51</x>
+      <y>120</y>
+      <width>311</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 700 18pt &quot;Segoe UI&quot;;
+</string>
+    </property>
+    <property name="text">
+     <string>Авторизация</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="password_linedit">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>180</y>
+      <width>291</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+     border-bottom: 2px solid green;
+    border-radius: 0;
+	padding-right:35px;
+}
+
+
+/* Стиль текста placeholder */
+QLineEdit[placeholderText]:focus {
+	border-bottom:2px solid #3dffa9;
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="echoMode">
+     <enum>QLineEdit::EchoMode::Password</enum>
+    </property>
+    <property name="placeholderText">
+     <string>Пароль</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="cancel_button">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>320</y>
+      <width>291</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton :hover {
+	border:1px solid white;
+}
+QPushButton {
+	background-color:#ff4c4c;
+}</string>
+    </property>
+    <property name="text">
+     <string>Отмена</string>
+    </property>
+    <property name="checkable">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="show_password_button">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>194</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color:transparent;
+border:none;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>30</width>
+      <height>30</height>
+     </size>
+    </property>
+    <property name="autoDefault">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="error_label">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>160</y>
+      <width>201</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 700 12pt &quot;Segoe UI&quot;;
+color:red;</string>
+    </property>
+    <property name="text">
+     <string>Неверный пароль</string>
+    </property>
+   </widget>
+   <zorder>password_linedit</zorder>
+   <zorder>label</zorder>
+   <zorder>user_button</zorder>
+   <zorder>admin_button</zorder>
+   <zorder>text_label</zorder>
+   <zorder>cancel_button</zorder>
+   <zorder>show_password_button</zorder>
+   <zorder>error_label</zorder>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

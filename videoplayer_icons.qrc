@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>high_sound.png</file>
+        <file>low_sound.png</file>
+        <file>pause.png</file>
+        <file>play.png</file>
+        <file>seek_back.png</file>
+        <file>seek_forward.png</file>
+        <file>muted.png</file>
+        <file>open_eye.png</file>
+        <file>close_eye.png</file>
+        <file>back_arrow.png</file>
+    </qresource>
+</RCC>
