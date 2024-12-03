@@ -11,6 +11,7 @@ void ListMovie::setupUI() {
     auto* searchline = new QLineEdit(this);
     auto* exitbutton = new QPushButton(this);
     auto* centralWidget = new QWidget(this);
+    auto* likedcatalog = new QPushButton(this);
     setCentralWidget(centralWidget);
 
     auto* mainLayout = new QVBoxLayout(centralWidget);
@@ -26,8 +27,19 @@ void ListMovie::setupUI() {
                               " background-color:#4b4b4b;"
                               " border:1px solid #303030;}");
 
+    likedcatalog->setFixedSize(100, 40);
+    likedcatalog->setIcon(QIcon(":/icons/favorites.png"));
+    likedcatalog->setIconSize(QSize(26, 26));
+    likedcatalog->setStyleSheet("QPushButton{"
+                              " border-radius:15px;"
+                              " background-color:#3b3b3a;}"
+                              "QPushButton:hover{"
+                              " background-color:#4b4b4b;"
+                              " border:1px solid #303030;}");
+
     searchline->setFixedSize(300, 40);
     searchline->setPlaceholderText("Поиск");
+    searchline->setFocusPolicy(Qt::ClickFocus);
     searchline->setStyleSheet("QLineEdit{"
                               " border-radius:18px;"
                               " padding:0 10px 0 20px;"
@@ -42,6 +54,7 @@ void ListMovie::setupUI() {
     scrollArea->setWidgetResizable(true);
 
     menulayout->addWidget(exitbutton);
+    menulayout->addWidget(likedcatalog,1, Qt::AlignRight);
     menulayout->addWidget(searchline, 0, Qt::AlignRight);
     mainLayout->addLayout(menulayout);
     mainLayout->addWidget(scrollArea);
@@ -129,12 +142,20 @@ void ListMovie::updateMovieDisplay(Stack<Movie>& movies,bool update) {
 
     clearGridLayout(gridLayout);
 
-    while (movies.hasNext()){
-        const Movie& movie = movies.front();
-        movies.next();
-        gridLayout->addWidget(new MovieWidget(movie.title(), QString::number(movie.year()), movie.genre(),
-                                              movie.rating(), movie.poster(),m_dbManager), iterator / count, iterator % count );
-        iterator++;
+    for (auto it = movies.begin(); it != movies.end(); ++it) {
+        const Movie& movie = *it;
+        gridLayout->addWidget(
+            new MovieWidget(
+                movie.title(),
+                QString::number(movie.year()),
+                movie.genre(),
+                movie.rating(),
+                movie.poster(),
+                m_dbManager
+                ),
+            iterator / count, iterator % count
+            );
+        ++iterator;
     }
 }
 

@@ -43,7 +43,7 @@ void Admin::on_pick_poster_clicked() {
 
 void Admin::on_pick_movie_clicked() {
     try {
-        QString Filename = QFileDialog::getOpenFileName(this, tr("Select movie"), "", tr("Video Files (*.mp4 *.avi)"));
+        QString Filename = QFileDialog::getOpenFileName(this, tr("Select movie"), "", tr("Video Files (*.mp4 *.mov)"));
         if (Filename.isEmpty()) return;
 
         QFile file(Filename);
@@ -107,6 +107,7 @@ void Admin::on_addmovie_button_clicked() {
 }
 
 void Admin::updateTable() {
+    m_dbManager.open();
     try {
         QSqlTableModel* model = new QSqlTableModel(this, m_dbManager.getDatabase());
         model->setTable("movies");

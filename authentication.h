@@ -22,12 +22,15 @@ public:
     ~Authentication();
 
 private slots:
-    void on_admin_button_clicked();
+    void on_register_button_clicked();
     void on_cancel_button_clicked();
     void on_show_password_button_clicked();
     void on_password_linedit_textChanged(const QString &arg1);
-    void on_user_button_clicked();
+    void on_entrance_button_clicked();
     QString hashPassword(const QString &password);
+    void resetUI();
+    void handleLogin();
+    void on_enter_button_clicked();
 
 private:
     Ui::Authentication *ui;

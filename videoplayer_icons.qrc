@@ -10,5 +10,6 @@
         <file>open_eye.png</file>
         <file>close_eye.png</file>
         <file>back_arrow.png</file>
+        <file>favorites.png</file>
     </qresource>
 </RCC>

@@ -50,8 +50,8 @@ DetailFIlmWidget::DetailFIlmWidget(DatabaseManager& dbManager,const QString& tit
     volume->setVolume(ui->horizontalSlider_Volume->value() / 100.0);
 
     // Setting up video widget
-    video->setParent(ui->groupBox_3);
-    video->setGeometry(0, 0, ui->groupBox_3->width(), ui->groupBox_3->height());
+    video->setParent(ui->groupBox_Video);
+    video->setGeometry(0, 0, ui->groupBox_Video->width(), ui->groupBox_Video->height());
     player->setVideoOutput(video);
     player->setAudioOutput(volume);
 

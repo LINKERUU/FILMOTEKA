@@ -1,55 +1,73 @@
 #include "SqlDatabase.h"
 
-
-DatabaseManager:: DatabaseManager(const QString& dbName) {
+DatabaseManager::DatabaseManager(const QString& dbName) {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
     m_db.setDatabaseName(dbName);
+    createTable();
 }
 
 bool DatabaseManager::open() {
     if (!m_db.open()) {
-        qDebug() << "Ошибка при открытии базы данных:" << m_db.lastError().text();
+        qCritical() << "Ошибка при открытии базы данных:" << m_db.lastError().text();
         return false;
     }
     return true;
 }
 
-void DatabaseManager:: close() {
+void DatabaseManager::close() {
     if (m_db.isOpen()) {
         m_db.close();
     }
 }
 
-bool DatabaseManager:: createTable() {
-    QSqlQuery query;
-    bool success = query.exec("CREATE TABLE IF NOT EXISTS movies ("
-                              "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                              "title TEXT, "
-                              "year INTEGER, "
-                              "genre TEXT, "
-                              "rating REAL, "
-                              "poster BLOB, "
-                              "description TEXT, "
-                              "duraction INTEGER, "
-                              "director TEXT, "
-                              "movie BLOB)");
+bool DatabaseManager::createTable() {
 
-    if (!success) {
-        qDebug() << "Ошибка при создании таблицы:" << query.lastError().text();
+    open();
+
+    QSqlQuery query;
+
+    // Создание таблицы фильмов
+    QSqlQuery queryMovies;
+    bool moviesTableSuccess = queryMovies.exec(
+        "CREATE TABLE IF NOT EXISTS movies ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "title TEXT, "
+        "year INTEGER, "
+        "genre TEXT, "
+        "rating REAL, "
+        "poster BLOB, "
+        "description TEXT, "
+        "duraction INTEGER, "
+        "director TEXT, "
+        "movie BLOB)"
+        );
+
+
+    if (!moviesTableSuccess) {
+        qCritical() << "Ошибка при создании таблиц:" << query.lastError().text();
+        return false;
     }
-    return success;
+
+    return true;
 }
 
-bool DatabaseManager:: insertMovie(const QString& title, int year, const QString& genre, double rating, const QPixmap& poster,
-                                  const QString& description, int duraction, const QString& director , const QByteArray& movie) {
+bool DatabaseManager::insertMovie(const QString& title, int year, const QString& genre, double rating,
+                                  const QPixmap& poster, const QString& description, int duraction,
+                                  const QString& director, const QByteArray& movie) {
     QSqlQuery query;
+
     QByteArray posterData;
     QBuffer buffer(&posterData);
-    buffer.open(QIODevice::WriteOnly);
-    poster.save(&buffer, "JPEG");
+    if (!buffer.open(QIODevice::WriteOnly) || !poster.save(&buffer, "JPEG")) {
+        qCritical() << "Ошибка при обработке постера.";
+        return false;
+    }
 
-    query.prepare("INSERT INTO movies (title, year, genre, rating, poster, description, duraction, director, movie)"
-                  "VALUES (:title, :year, :genre, :rating, :poster, :description, :duraction, :director, :movie)");
+    // Подготовка SQL-запроса
+    query.prepare(
+        "INSERT INTO movies (title, year, genre, rating, poster, description, duraction, director, movie) "
+        "VALUES (:title, :year, :genre, :rating, :poster, :description, :duraction, :director, :movie)"
+        );
     query.bindValue(":title", title);
     query.bindValue(":year", year);
     query.bindValue(":genre", genre);
@@ -61,9 +79,10 @@ bool DatabaseManager:: insertMovie(const QString& title, int year, const QString
     query.bindValue(":movie", movie);
 
     if (!query.exec()) {
-        qDebug() << "Ошибка при вставке фильма:" << query.lastError().text();
+        qCritical() << "Ошибка при добавлении фильма:" << query.lastError().text();
         return false;
     }
+
     return true;
 }
 
@@ -80,32 +99,33 @@ Stack<Movie> DatabaseManager::getMovies() {
         movie.setPoster(query.value(4).toByteArray());
         movies.add(movie);
     }
+
     return movies;
 }
 
 Stack<FilmDetail> DatabaseManager::getFilm(const QString& m_title) {
+    Stack<FilmDetail> films;
     QSqlQuery query;
+
     query.prepare("SELECT * FROM movies WHERE title = :title");
     query.bindValue(":title", m_title);
 
-    Stack<FilmDetail> films;
-
     if (!query.exec()) {
-        qWarning() << "Ошибка выполнения запроса:" << query.lastError().text();
+        qCritical() << "Ошибка при выполнении запроса:" << query.lastError().text();
         return films;
     }
 
     while (query.next()) {
         FilmDetail film;
-        film.setTitle(query.value(1).toString());
-        film.setYear(query.value(2).toInt());
-        film.setGenre(query.value(3).toString());
-        film.setRating(query.value(4).toDouble());
-        film.setPoster(query.value(5).toByteArray());
-        film.setDescription(query.value(6).toString());
-        film.setDuraction(query.value(7).toInt());
-        film.setDirector(query.value(8).toString());
-        film.setMovie(query.value(9).toByteArray());
+        film.setTitle(query.value("title").toString());
+        film.setYear(query.value("year").toInt());
+        film.setGenre(query.value("genre").toString());
+        film.setRating(query.value("rating").toDouble());
+        film.setPoster(query.value("poster").toByteArray());
+        film.setDescription(query.value("description").toString());
+        film.setDuraction(query.value("duraction").toInt());
+        film.setDirector(query.value("director").toString());
+        film.setMovie(query.value("movie").toByteArray());
         films.add(film);
     }
 
@@ -114,35 +134,37 @@ Stack<FilmDetail> DatabaseManager::getFilm(const QString& m_title) {
 
 bool DatabaseManager::deleteMovieById(int id) {
     QSqlQuery query;
+
     query.prepare("DELETE FROM movies WHERE id = :id");
     query.bindValue(":id", id);
 
     if (!query.exec()) {
-        qDebug() << "Ошибка при удалении фильма с id" << id << ":" << query.lastError().text();
+        qCritical() << "Ошибка при удалении фильма с id" << id << ":" << query.lastError().text();
         return false;
     }
+
     return true;
 }
 
 QSqlDatabase DatabaseManager::getDatabase() {
-    return QSqlDatabase::database();
+    return m_db;
 }
-
 
 Stack<Movie> DatabaseManager::search(const QString& text) {
     Stack<Movie> movies;
-
     QSqlQuery query;
 
     query.exec("PRAGMA case_sensitive_like=OFF");
 
-    query.prepare("SELECT title, year, genre, rating, poster FROM movies WHERE "
-                  "(title LIKE :title) OR (UPPER(title) LIKE :title_upper)");
+    query.prepare(
+        "SELECT title, year, genre, rating, poster FROM movies WHERE "
+        "title LIKE :title OR UPPER(title) LIKE :title_upper"
+        );
     query.bindValue(":title", "%" + text + "%");
     query.bindValue(":title_upper", "%" + text.toUpper() + "%");
 
     if (!query.exec()) {
-        qDebug() << "Ошибка выполнения запроса поиска: " << query.lastError().text();
+        qCritical() << "Ошибка при выполнении запроса поиска:" << query.lastError().text();
         return movies;
     }
 
@@ -159,3 +181,38 @@ Stack<Movie> DatabaseManager::search(const QString& text) {
     return movies;
 }
 
+bool DatabaseManager::insertUser(const QString& username, const QString& password) {
+
+    QSqlQuery query;
+
+    query.prepare("INSERT INTO users (username, password) VALUES (:username, :password)");
+    query.bindValue(":username", username);
+    query.bindValue(":password", password);
+
+    if (!query.exec()) {
+        qCritical() << "Ошибка при добавлении пользователя:" << query.lastError().text();
+        return false;
+    }
+
+    return true;
+}
+
+
+QString DatabaseManager::login(const QString& username) {
+
+    QSqlQuery query;
+    query.prepare("SELECT password FROM users WHERE username = :username");
+    query.bindValue(":username", username);
+
+    if (!query.exec()) {
+        qCritical() << "Ошибка выполнения запроса:" << query.lastError().text();
+        return QString();  // Возвращаем пустую строку в случае ошибки запроса
+    }
+
+    if (!query.next()) {
+        qCritical() << "Пользователь не найден:" << username;
+        return QString();  // Возвращаем пустую строку, если пользователь не найден
+    }
+
+    return query.value(0).toString();
+}

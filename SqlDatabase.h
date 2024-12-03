@@ -27,6 +27,8 @@ public:
     Stack<Movie> search(const QString& text);
     Stack<FilmDetail> getFilm(const QString& m_title);
     QSqlDatabase getDatabase();
+    bool insertUser(const QString& username, const QString& password);
+    QString login(const QString& username);
 
 protected:
     QSqlDatabase m_db;
