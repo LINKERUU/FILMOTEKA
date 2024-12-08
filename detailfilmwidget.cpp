@@ -24,7 +24,6 @@ DetailFIlmWidget::DetailFIlmWidget(DatabaseManager& dbManager,const QString& tit
     ui->genre_label->adjustSize();
 
     ui->back_button->setIcon(QIcon(":/icons/back_arrow.png"));
-    ui->back_button->setVisible(false);
 
     // Load and display poster
     QPixmap pixmap;
@@ -163,10 +162,10 @@ void DetailFIlmWidget::positionChanged(qint64 Duration){
     updateDuration(Duration/1000);
 }
 
-// void DetailFIlmWidget::on_back_button_clicked()
-// {
-//     ListMovie* catalogmovie = new ListMovie(m_dbManager);
-//     catalogmovie->show();
-//     this->close();
-// }
+void DetailFIlmWidget::on_back_button_clicked()
+{
+    ListMovie* catalogmovie = new ListMovie(m_dbManager);
+    catalogmovie->show();
+    this->close();
+}
 

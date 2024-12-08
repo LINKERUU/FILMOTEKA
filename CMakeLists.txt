@@ -49,6 +49,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         authentication.h authentication.cpp authentication.ui
         exceptionhandler.h exceptionhandler.cpp
         noneditabledelegate.h noneditabledelegate.cpp
+        favoriteslist.h favoriteslist.cpp
+
 
 
 

@@ -1,5 +1,6 @@
-#ifndef DATABASEMANAGER_H
-#define DATABASEMANAGER_H
+#ifndef DATABASE_MANAGER_H
+#define DATABASE_MANAGER_H
+
 
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -29,9 +30,18 @@ public:
     QSqlDatabase getDatabase();
     bool insertUser(const QString& username, const QString& password);
     QString login(const QString& username);
+    bool addFavoriteMovie(int user_id, int movie_id);
+    bool removeFavoriteMovie(int user_id, int movie_id);
+    Stack<Movie> getFavoriteMovies(int user_id);
+    int getUserId();
+    int getMovieId(const QString& title);
+    bool isMovieLiked(int user_id, int movie_id);
+
 
 protected:
+    int m_currentUserId;
     QSqlDatabase m_db;
 };
 
-#endif // DATABASEMANAGER_H
+#endif // DATABASE_MANAGER_H
+

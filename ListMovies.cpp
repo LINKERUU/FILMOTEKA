@@ -1,4 +1,6 @@
 #include "ListMovies.h"
+#include "FavoritesList.h"  // Добавьте это, чтобы подключить класс FavoritesList
+
 
 ListMovie::ListMovie(DatabaseManager& dbManager, QWidget* parent)
     : QMainWindow(parent), m_dbManager(dbManager) {
@@ -63,6 +65,7 @@ void ListMovie::setupUI() {
     auto* gridLayout = new QGridLayout(scrollWidget);
     scrollArea->setWidget(scrollWidget);
 
+    connect(likedcatalog, &QPushButton::clicked, this, &ListMovie::openFavoriteMovies);
     connect(exitbutton, &QPushButton::clicked, this, &ListMovie::on_exitbutton_click);
     connect(searchline, &QLineEdit::textChanged, this, &ListMovie::search_movie);
 
@@ -151,8 +154,8 @@ void ListMovie::updateMovieDisplay(Stack<Movie>& movies,bool update) {
                 movie.genre(),
                 movie.rating(),
                 movie.poster(),
-                m_dbManager
-                ),
+                m_dbManager,
+                this),
             iterator / count, iterator % count
             );
         ++iterator;
@@ -177,3 +180,14 @@ void ListMovie::on_exitbutton_click() {
     this->close();
     login->exec();
 }
+
+void ListMovie::openFavoriteMovies() {
+    auto* likedMovieWindow = new FavoritesList(m_dbManager, this);
+    likedMovieWindow->setAttribute(Qt::WA_DeleteOnClose);
+    connect(likedMovieWindow, &QWidget::destroyed, this, [this]() {
+        this->show();
+    });
+    likedMovieWindow->show();
+    this->hide();
+}
+

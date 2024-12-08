@@ -7,6 +7,7 @@ Admin::Admin(DatabaseManager& dbManager, QWidget *parent)
 {
     ui->setupUi(this);
     setFixedSize(1384, 634);
+    setWindowTitle("Панель администратора");
 
     connect(ui->pick_poster, &QPushButton::clicked, this, &Admin::on_pick_poster_clicked);
     connect(ui->pick_movie, &QPushButton::clicked, this, &Admin::on_pick_movie_clicked);

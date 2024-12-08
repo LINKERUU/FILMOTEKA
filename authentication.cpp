@@ -10,6 +10,7 @@ Authentication::Authentication(DatabaseManager& dbManager, QWidget *parent)
     ui->setupUi(this);
     m_dbManager.open();
     setFixedSize(1111, 462);
+    setWindowTitle("Авторизация");
     resetUI();
 }
 
@@ -127,8 +128,9 @@ void Authentication::on_enter_button_clicked() {
 
 void Authentication::handleLogin() {
     QString enteredPasswordHash = hashPassword(ui->password_linedit->text());
-    QString storedPasswordHash = m_dbManager.login(ui->login_linedit->text());
     QString adminPasswordHash = m_dbManager.login("admin");
+    QString storedPasswordHash = m_dbManager.login(ui->login_linedit->text());
+
 
 
     if (enteredPasswordHash == storedPasswordHash && ui->login_linedit->text()!="admin") {

@@ -13,6 +13,7 @@
 #include <QTime>
 #include "moviewidget.h"
 #include <QScrollBar>
+#include <QCloseEvent>
 
 
 namespace Ui {
@@ -29,6 +30,11 @@ public:
     ~DetailFIlmWidget();
 
 private slots:
+    void closeparentEvent(QCloseEvent* event) {
+        emit windowClosed();
+        QWidget::closeEvent(event);  // Вызываем базовую реализацию
+    }
+
     void durationChanged(qint64 Duration);
 
     void positionChanged(qint64 Duration);
@@ -47,7 +53,10 @@ private slots:
 
     void closeEvent(QCloseEvent *event);
 
-    // void on_back_button_clicked();
+    void on_back_button_clicked();
+
+signals:
+    void windowClosed();
 
 private:
     DatabaseManager& m_dbManager;

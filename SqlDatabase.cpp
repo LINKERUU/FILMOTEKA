@@ -21,14 +21,15 @@ void DatabaseManager::close() {
 }
 
 bool DatabaseManager::createTable() {
-
-    open();
+    if (!open()) {
+        qCritical() << "Не удалось открыть базу данных для создания таблиц.";
+        return false;
+    }
 
     QSqlQuery query;
 
-    // Создание таблицы фильмов
-    QSqlQuery queryMovies;
-    bool moviesTableSuccess = queryMovies.exec(
+    // Создание таблицы movies
+    QString createMoviesTableQuery =
         "CREATE TABLE IF NOT EXISTS movies ("
         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
         "title TEXT, "
@@ -39,17 +40,29 @@ bool DatabaseManager::createTable() {
         "description TEXT, "
         "duraction INTEGER, "
         "director TEXT, "
-        "movie BLOB)"
-        );
+        "movie BLOB)";
 
+    if (!query.exec(createMoviesTableQuery)) {
+        qCritical() << "Ошибка при создании таблицы movies:" << query.lastError().text();
+        return false;
+    }
 
-    if (!moviesTableSuccess) {
-        qCritical() << "Ошибка при создании таблиц:" << query.lastError().text();
+    // Создание таблицы users
+    QString createUsersTableQuery =
+        "CREATE TABLE IF NOT EXISTS users ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "username TEXT UNIQUE NOT NULL, "
+        "password TEXT NOT NULL, "
+        "liked_movies_id TEXT)";
+
+    if (!query.exec(createUsersTableQuery)) {
+        qCritical() << "Ошибка при создании таблицы users:" << query.lastError().text();
         return false;
     }
 
     return true;
 }
+
 
 bool DatabaseManager::insertMovie(const QString& title, int year, const QString& genre, double rating,
                                   const QPixmap& poster, const QString& description, int duraction,
@@ -154,8 +167,6 @@ Stack<Movie> DatabaseManager::search(const QString& text) {
     Stack<Movie> movies;
     QSqlQuery query;
 
-    query.exec("PRAGMA case_sensitive_like=OFF");
-
     query.prepare(
         "SELECT title, year, genre, rating, poster FROM movies WHERE "
         "title LIKE :title OR UPPER(title) LIKE :title_upper"
@@ -201,18 +212,189 @@ bool DatabaseManager::insertUser(const QString& username, const QString& passwor
 QString DatabaseManager::login(const QString& username) {
 
     QSqlQuery query;
-    query.prepare("SELECT password FROM users WHERE username = :username");
+    query.prepare("SELECT id, password FROM users WHERE username = :username");
     query.bindValue(":username", username);
 
     if (!query.exec()) {
         qCritical() << "Ошибка выполнения запроса:" << query.lastError().text();
-        return QString();  // Возвращаем пустую строку в случае ошибки запроса
+        return QString();
     }
 
     if (!query.next()) {
         qCritical() << "Пользователь не найден:" << username;
-        return QString();  // Возвращаем пустую строку, если пользователь не найден
+        return QString();
     }
 
-    return query.value(0).toString();
+    m_currentUserId = query.value(0).toInt();
+
+    return query.value(1).toString();
+}
+
+bool DatabaseManager::addFavoriteMovie(int user_id, int movie_id) {
+    QSqlQuery query;
+
+    query.prepare("SELECT liked_movies_id FROM users WHERE id = :user_id");
+    query.bindValue(":user_id", user_id);
+
+    if (!query.exec() || !query.next()) {
+        qCritical() << "Ошибка при получении списка понравившихся фильмов:" << query.lastError().text();
+        return false;
+    }
+
+    QString likedMovies = query.value(0).toString();
+    QStringList moviesList = likedMovies.split(",", Qt::SkipEmptyParts);
+
+    if (moviesList.contains(QString::number(movie_id))) {
+        qDebug() << "Фильм уже добавлен в понравившиеся.";
+        return true;
+    }
+
+    moviesList.append(QString::number(movie_id));
+    likedMovies = moviesList.join(",");
+
+    query.prepare("UPDATE users SET liked_movies_id = :liked_movies_id WHERE id = :user_id");
+    query.bindValue(":liked_movies_id", likedMovies);
+    query.bindValue(":user_id", user_id);
+
+    if (!query.exec()) {
+        qCritical() << "Ошибка при обновлении списка понравившихся фильмов:" << query.lastError().text();
+        return false;
+    }
+
+    qDebug()<<"фильм добавлен";
+
+    return true;
+}
+
+bool DatabaseManager::removeFavoriteMovie(int user_id, int movie_id) {
+    QSqlQuery query;
+
+    query.prepare("SELECT liked_movies_id FROM users WHERE id = :user_id");
+    query.bindValue(":user_id", user_id);
+
+    if (!query.exec() || !query.next()) {
+        qCritical() << "Ошибка при получении списка понравившихся фильмов:" << query.lastError().text();
+        return false;
+    }
+
+    QString likedMovies = query.value(0).toString();
+    QStringList moviesList = likedMovies.split(",", Qt::SkipEmptyParts);
+
+    if (!moviesList.contains(QString::number(movie_id))) {
+        qDebug() << "Фильм отсутствует в списке понравившихся.";
+        return true;
+    }
+
+    moviesList.removeAll(QString::number(movie_id));
+    likedMovies = moviesList.join(",");
+
+    query.prepare("UPDATE users SET liked_movies_id = :liked_movies_id WHERE id = :user_id");
+    query.bindValue(":liked_movies_id", likedMovies);
+    query.bindValue(":user_id", user_id);
+
+    if (!query.exec()) {
+        qCritical() << "Ошибка при обновлении списка понравившихся фильмов:" << query.lastError().text();
+        return false;
+    }
+
+    qDebug()<<"фильм удален";
+
+    return true;
+}
+
+Stack<Movie> DatabaseManager::getFavoriteMovies(int user_id) {
+    QSqlQuery query;
+
+    // Получаем строку с ID понравившихся фильмов
+    query.prepare("SELECT liked_movies_id FROM users WHERE id = :user_id");
+    query.bindValue(":user_id", user_id);
+
+    if (!query.exec() || !query.next()) {
+        qCritical() << "Ошибка при получении списка понравившихся фильмов:" << query.lastError().text();
+        return Stack<Movie>();
+    }
+
+    QString likedMovies = query.value(0).toString();
+    QStringList moviesList = likedMovies.split(",", Qt::SkipEmptyParts);
+
+    if (moviesList.isEmpty()) {
+        return Stack<Movie>(); // Нет понравившихся фильмов
+    }
+
+    // Получаем информацию о фильмах по их ID
+    query.prepare(
+        "SELECT id, title, year, genre, rating, poster FROM movies WHERE id IN (" +
+        moviesList.join(",") + ")"
+        );
+
+    Stack<Movie> movies;
+
+    if (!query.exec()) {
+        qCritical() << "Ошибка при получении информации о фильмах:" << query.lastError().text();
+        return movies;
+    }
+
+    while (query.next()) {
+        Movie movie;
+        movie.setTitle(query.value("title").toString());
+        movie.setYear(query.value("year").toInt());
+        movie.setGenre(query.value("genre").toString());
+        movie.setRating(query.value("rating").toDouble());
+        movie.setPoster(query.value("poster").toByteArray());
+        movies.add(movie);
+    }
+
+    return movies;
+}
+
+int DatabaseManager::getMovieId(const QString& title) {
+    QSqlQuery query;
+
+    query.prepare("SELECT id FROM movies WHERE title = :title");
+    query.bindValue(":title", title);
+
+    if (!query.exec()) {
+        qCritical() << "Ошибка при выполнении запроса для получения ID фильма:" << query.lastError().text();
+        return -1;
+    }
+
+    if (query.next()) {
+        return query.value(0).toInt();
+    } else {
+        qWarning() << "Фильм с названием" << title << "не найден.";
+        return -1;
+    }
+}
+
+int DatabaseManager::getUserId() {
+    if (m_currentUserId == -1) {
+        qWarning() << "Пользователь не авторизован.";
+    }
+    return m_currentUserId;
+}
+
+bool DatabaseManager::isMovieLiked(int user_id, int movie_id) {
+
+    QSqlQuery query;
+
+    // Получаем список понравившихся фильмов для пользователя
+    query.prepare("SELECT liked_movies_id FROM users WHERE id = :user_id");
+    query.bindValue(":user_id", user_id);
+
+    if (!query.exec()) {
+        qCritical() << "Ошибка при выполнении запроса для проверки понравившихся фильмов:" << query.lastError().text();
+        return false;
+    }
+
+    if (!query.next()) {
+        qWarning() << "Пользователь с id" << user_id << "не найден.";
+        return false;
+    }
+
+    // Получаем строку с ID понравившихся фильмов
+    QString likedMovies = query.value(0).toString();
+    QStringList moviesList = likedMovies.split(",", Qt::SkipEmptyParts);
+
+    // Проверяем наличие ID фильма в списке
+    return moviesList.contains(QString::number(movie_id));
 }

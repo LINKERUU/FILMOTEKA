@@ -12,10 +12,18 @@ class ListMovie : public QMainWindow {
 public:
     ListMovie(DatabaseManager& dbManager, QWidget* parent = nullptr);
 
-private:
-    void setupUI();
+protected:
+    void updateMovieDisplay(Stack<Movie>& movies,bool update);
+
+    DatabaseManager& m_dbManager;
 
     void configureGridLayout( QGridLayout* gridLayout);
+
+    void clearGridLayout(QGridLayout* gridLayout);
+
+private:
+
+    void setupUI();
 
     void loadMovies(bool flag);
 
@@ -25,11 +33,7 @@ private:
 
     void search_movie(const QString& text);
 
-    void updateMovieDisplay(Stack<Movie>& movies,bool update);
-
-    void clearGridLayout(QGridLayout* gridLayout);
-
-    DatabaseManager& m_dbManager;
+    void openFavoriteMovies();
 
 };
 

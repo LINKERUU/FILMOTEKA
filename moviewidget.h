@@ -29,7 +29,7 @@ public:
                 const QByteArray& posterData, DatabaseManager& dbManager, QWidget* parent = nullptr);
 
 private:
-    bool m_isLiked = true;
+    bool m_isLiked = false;
     DatabaseManager& m_dbManager; // Добавлено поле для менеджера базы данных
 
     // Методы для настройки интерфейса
@@ -37,17 +37,21 @@ private:
     QVBoxLayout* createMainLayout();
     void setupPoster(QVBoxLayout* mainLayout, const QByteArray& posterData, QString title);
     QLabel* createImageLabel(const QByteArray& posterData,QString title);
-    void setupRatingAndLikeButtons(QVBoxLayout* mainLayout, double rating);
-    QHBoxLayout* createRatingLikeLayout(double rating);
+    void setupRatingAndLikeButtons(QVBoxLayout* mainLayout, double rating , const QString& title);
     QLabel* createRatingLabel(double rating);
-    QPushButton* createLikeButton();
+    QPushButton* createLikeButton(const QString& title);
     void setupTitleAndInfo(QVBoxLayout* mainLayout, const QString& title, const QString& year, const QString& genre);
     QVBoxLayout* createInfoLayout(const QString& title, const QString& year, const QString& genre);
     QHBoxLayout* createTitleLabel(const QString& title);
     QHBoxLayout* createYearGenreLayout(const QString& year, const QString& genre);
-    void toggleLikeButton();
+    void toggleLikeButton(const QString& title, QPushButton* likeButton);
     void openNewWindow(const QString& title);
     DetailFIlmWidget *film_window;
+    void checkLikedMovie(const QString& title, QPushButton* likeButton);
+    QHBoxLayout* createRatingLikeLayout(double rating, const QString& title);
+    QPushButton* createDeleteButton(const QString& title);
+    void deleteMovieFromFavorites(const QString& title);
+
 };
 
 #endif // MOVIEWIDGET_H
