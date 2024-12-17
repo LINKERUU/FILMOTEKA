@@ -22,13 +22,15 @@ DetailFIlmWidget::DetailFIlmWidget(DatabaseManager& dbManager,const QString& tit
     ui->year_label->adjustSize();
     ui->genre_label->setText(genre);
     ui->genre_label->adjustSize();
+    ui->back_button->setVisible(false);
 
     ui->back_button->setIcon(QIcon(":/icons/back_arrow.png"));
 
     // Load and display poster
     QPixmap pixmap;
     pixmap.loadFromData(poster);
-    ui->poster_label->setPixmap(pixmap);
+    ui->poster_label->setPixmap(pixmap.scaled(ui->poster_label->size(),Qt::KeepAspectRatio));
+
     ui->description_label->setText(description);
     ui->duration_label->setText(QString("%1 мин.").arg(duration));
     ui->director_label->setText(director);
@@ -160,12 +162,5 @@ void DetailFIlmWidget::positionChanged(qint64 Duration){
         ui->horizontalSlider_Duration->setValue(Duration/1000);
     }
     updateDuration(Duration/1000);
-}
-
-void DetailFIlmWidget::on_back_button_clicked()
-{
-    ListMovie* catalogmovie = new ListMovie(m_dbManager);
-    catalogmovie->show();
-    this->close();
 }
 

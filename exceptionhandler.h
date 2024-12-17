@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QStyledItemDelegate>
 #include <QLineEdit>
+#include <QDate>
 #include <QIntValidator>
 #include <QDoubleSpinBox>
 
@@ -18,9 +19,9 @@ public:
 
     ExceptionHandler(QObject* parent = nullptr);
 
+    QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem &option, const QModelIndex &index)const;
 
-    void setModelData(QWidget* editor, QAbstractItemModel* model,
-                      const QModelIndex& index) ;
+    void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const;
 
     static void handleException(const QString& errMessage, QWidget* parent = nullptr);
 

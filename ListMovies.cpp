@@ -184,10 +184,13 @@ void ListMovie::on_exitbutton_click() {
 void ListMovie::openFavoriteMovies() {
     auto* likedMovieWindow = new FavoritesList(m_dbManager, this);
     likedMovieWindow->setAttribute(Qt::WA_DeleteOnClose);
-    connect(likedMovieWindow, &QWidget::destroyed, this, [this]() {
-        this->show();
-    });
     likedMovieWindow->show();
+    connect(likedMovieWindow, &QWidget::destroyed, this, [this]() {
+        this->showNormal();
+        this->loadMovies(true);
+    });
     this->hide();
 }
+
+
 

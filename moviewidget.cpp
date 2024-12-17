@@ -49,13 +49,11 @@ QLabel* MovieWidget::createImageLabel(const QByteArray& posterData, QString titl
 
     image.setMask(roundedMask);
 
-    imageLabel->setPixmap(image.scaled(300, 300, Qt::KeepAspectRatio));
+    imageLabel->setPixmap(image.scaled(imageLabel->size(), Qt::KeepAspectRatio));
 
     imageLabel->setCursor(Qt::PointingHandCursor);
 
     connect(imageLabel, &ClickableLabel::clicked, this, [this, title]() { openNewWindow(title); });
-
-
 
     return imageLabel;
 }
@@ -104,6 +102,7 @@ void MovieWidget::checkLikedMovie(const QString& title,QPushButton* likeButton){
     }
     else {
         likeButton->setStyleSheet("QPushButton { color:red; border-radius:60px; font-size:36px; }");
+         m_isLiked=!m_isLiked;
     }
 }
 
@@ -167,9 +166,7 @@ QHBoxLayout* MovieWidget::createYearGenreLayout(const QString& year, const QStri
     yearlabel->setFont(QFont("Arial", 13));
     elem->setFont(QFont("Arial", 16));
     genrelabel->setFont(QFont("Arial", 13));
-    yearlabel->setStyleSheet("QLabel:hover{color:#ff3b3b;}");
-    genrelabel->setStyleSheet("QLabel{max-width:125px;}"
-                              "QLabel:hover{color:#ff3b3b;}");
+    genrelabel->setStyleSheet("QLabel{max-width:125px;}");
 
     yearGenreLayout->addWidget(yearlabel);
     yearGenreLayout->addWidget(elem);
@@ -249,5 +246,14 @@ void MovieWidget::deleteMovieFromFavorites(const QString& title) {
 
     m_dbManager.removeFavoriteMovie(user_id, movie_id);
 
+    if (auto* parentFavoritesList = qobject_cast<FavoritesList*>(parent()->parent()->parent())) {
+        parentFavoritesList->update();
+    } else {
+        qDebug() << "Ошибка: Родительский объект не является FavoritesList.";
+    }
+
+    // Закрытие текущего MovieWidget
+    this->close();
 }
+
 

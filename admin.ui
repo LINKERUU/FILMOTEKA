@@ -421,7 +421,7 @@ font: 9pt &quot;Segoe UI&quot;;</string>
      <string notr="true">font: 9pt &quot;Segoe UI&quot;;</string>
     </property>
     <property name="decimals">
-     <number>2</number>
+     <number>1</number>
     </property>
     <property name="minimum">
      <double>0.000000000000000</double>

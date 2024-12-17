@@ -12,8 +12,9 @@ class ListMovie : public QMainWindow {
 public:
     ListMovie(DatabaseManager& dbManager, QWidget* parent = nullptr);
 
-protected:
     void updateMovieDisplay(Stack<Movie>& movies,bool update);
+
+protected:
 
     DatabaseManager& m_dbManager;
 
@@ -34,6 +35,8 @@ private:
     void search_movie(const QString& text);
 
     void openFavoriteMovies();
+
+
 
 };
 

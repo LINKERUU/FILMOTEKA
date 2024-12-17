@@ -23,18 +23,12 @@ class DetailFIlmWidget;
 class DetailFIlmWidget : public QDialog , public FilmDetail
 {
     Q_OBJECT
-
 public:
     DetailFIlmWidget(DatabaseManager& dbManager,const QString& title, int year, const QString& genre, double rating, const QByteArray& poster,
                      const QString& description, int duraction, const QString& director, const QByteArray& movie,QWidget *parent = nullptr);
     ~DetailFIlmWidget();
 
 private slots:
-    void closeparentEvent(QCloseEvent* event) {
-        emit windowClosed();
-        QWidget::closeEvent(event);  // Вызываем базовую реализацию
-    }
-
     void durationChanged(qint64 Duration);
 
     void positionChanged(qint64 Duration);
@@ -52,11 +46,6 @@ private slots:
     void on_horizontalSlider_Volume_valueChanged(int value);
 
     void closeEvent(QCloseEvent *event);
-
-    void on_back_button_clicked();
-
-signals:
-    void windowClosed();
 
 private:
     DatabaseManager& m_dbManager;

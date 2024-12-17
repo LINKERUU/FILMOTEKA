@@ -670,7 +670,7 @@ border-radius:0px;</string>
        <property name="geometry">
         <rect>
          <x>5</x>
-         <y>-20</y>
+         <y>0</y>
          <width>863</width>
          <height>441</height>
         </rect>

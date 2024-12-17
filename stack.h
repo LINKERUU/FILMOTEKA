@@ -7,42 +7,33 @@
 template <typename T>
 class Stack {
 public:
-    // Добавить элемент в стек
+
     void add(const T& item);
 
-    // Получить верхний элемент
     T front() const;
 
-    // Проверить, есть ли еще элементы
     bool hasNext() const;
 
-    // Удалить верхний элемент (переход к следующему)
     void next();
 
-    // Получить количество элементов в стеке
     size_t size() const;
 
     size_t reset();
 
-    // Итератор
     class Iterator {
     public:
         explicit Iterator(Stack<T>& stack);
 
-        // Разадресация
         T operator*() const;
 
-        // Префиксный инкремент
         Iterator& operator++();
 
-        // Проверка на неравенство
         bool operator!=(const Iterator& other) const;
 
     private:
         Stack<T>* stackPtr;
     };
 
-    // Создать итератор
     Iterator begin();
     Iterator end();
 

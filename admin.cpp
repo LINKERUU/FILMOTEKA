@@ -121,13 +121,14 @@ void Admin::updateTable() {
         ui->tableView->setModel(model);
         ui->tableView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked);
 
-        ui->tableView->setItemDelegateForColumn(0, new NonEditableDelegate(ui->tableView));
+        // Устанавливаем делегаты для проверки значений
+        ui->tableView->setItemDelegateForColumn(0, new NonEditableDelegate(ui->tableView)); // Название
+        ui->tableView->setItemDelegateForColumn(1, new ExceptionHandler()); // Год
+        ui->tableView->setItemDelegateForColumn(2, new ExceptionHandler()); // Рейтинг
+        ui->tableView->setItemDelegateForColumn(4, new ExceptionHandler()); // Длительность
+        ui->tableView->setItemDelegateForColumn(7, new ExceptionHandler()); // Длительность
 
-        ui->tableView->setItemDelegateForColumn(1, new ExceptionHandler(ui->tableView));
-        ui->tableView->setItemDelegateForColumn(2, new ExceptionHandler(ui->tableView));
-        ui->tableView->setItemDelegateForColumn(4, new ExceptionHandler(ui->tableView));
-        ui->tableView->setItemDelegateForColumn(7, new ExceptionHandler(ui->tableView));
-
+        // Настройка заголовков столбцов
         model->setHeaderData(0, Qt::Horizontal, tr("ID"));
         model->setHeaderData(1, Qt::Horizontal, tr("Название"));
         model->setHeaderData(2, Qt::Horizontal, tr("Год"));
@@ -139,12 +140,14 @@ void Admin::updateTable() {
 
         ui->tableView->hideColumn(5);
         ui->tableView->hideColumn(9);
+
     } catch (const QString& err) {
         ExceptionHandler::handleException(err, this);
     } catch (...) {
         ExceptionHandler::handleUnknownException(this);
     }
 }
+
 
 
 void Admin::on_remove_button_clicked() {

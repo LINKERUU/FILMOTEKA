@@ -3,9 +3,8 @@
 FavoritesList::FavoritesList(DatabaseManager& dbManager, QWidget* parent)
     : ListMovie(dbManager, parent) {
     setWindowTitle("Избранное");
-    loadMovies();
     setupUI();
-
+    loadMovies(true);
 }
 
 void FavoritesList::setupUI() {
@@ -37,10 +36,8 @@ void FavoritesList::setupUI() {
     mainLayout->addLayout(menulayout);
     mainLayout->addWidget(scrollArea);
 
-    // Связываем кнопку выхода с закрытием окна
     connect(exitbutton, &QPushButton::clicked, this, &FavoritesList::close);
 
-    // Настройка области с фильмами
     auto* scrollWidget = new QWidget();
     auto* gridLayout = new QGridLayout(scrollWidget);
     scrollArea->setWidget(scrollWidget);
@@ -48,33 +45,32 @@ void FavoritesList::setupUI() {
     configureGridLayout(gridLayout);
 }
 
-void FavoritesList::loadMovies() {
+void FavoritesList::loadMovies(bool flag) {
     int userId = m_dbManager.getUserId();
 
     Stack<Movie> favoriteMovies = m_dbManager.getFavoriteMovies(userId);
 
-    auto* scrollWidget = static_cast<QWidget*>(centralWidget()->findChild<QScrollArea*>()->widget());
-    auto* gridLayout = static_cast<QGridLayout*>(scrollWidget->layout());
+    if (favoriteMovies.hasNext()) {
+        updateMovieDisplay(favoriteMovies,flag);
+    }
+    else {
+        auto* scrollWidget = static_cast<QWidget*>(centralWidget()->findChild<QScrollArea*>()->widget());
+        auto* gridLayout = static_cast<QGridLayout*>(scrollWidget->layout());
 
-    if (!gridLayout) return;
+        if (gridLayout) {
+            clearGridLayout(gridLayout);
+        }
 
-    clearGridLayout(gridLayout);
-
-    if (!favoriteMovies.hasNext()) {
         QLabel* noMoviesLabel = new QLabel("Избранных фильмов нет", this);
         noMoviesLabel->setAlignment(Qt::AlignCenter);
         noMoviesLabel->setStyleSheet("font-size: 24px; color: gray;");
         gridLayout->addWidget(noMoviesLabel, 0, 0);
-        return;
     }
-
-    updateMovieDisplay(favoriteMovies, true);
 }
-
 
 void FavoritesList::resizeEvent(QResizeEvent* event) {
     QMainWindow::resizeEvent(event);
-    loadMovies();
+    loadMovies(false);
 }
 
 void FavoritesList::on_exitbutton_click() {
@@ -82,5 +78,4 @@ void FavoritesList::on_exitbutton_click() {
     movieListWindow->show();
 
     this->close();
-    delete this;
 }
